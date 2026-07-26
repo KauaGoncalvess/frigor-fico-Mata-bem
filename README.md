@@ -62,6 +62,29 @@ npm run db:migrar    # aplica no banco
 npm run db:semear    # (opcional) catálogo inicial para editar
 ```
 
+**Não precisa ser Neon.** O projeto usa Postgres padrão (`postgres.js` +
+Drizzle), então serve qualquer Postgres: Supabase, Railway, Render, o Postgres
+do marketplace da Vercel ou um Postgres na sua máquina. Trocar de provedor é
+trocar a `DATABASE_URL`, mais nada.
+
+Para rodar com um Postgres local — jeito mais rápido de ver o sistema
+funcionando de verdade, sem criar conta em serviço nenhum:
+
+```bash
+# com Docker
+docker run --name matabem-pg -e POSTGRES_PASSWORD=senha \
+  -p 5432:5432 -d postgres:16
+
+export DATABASE_URL="postgresql://postgres:senha@localhost:5432/postgres"
+npm run db:migrar
+npm run db:semear
+npm run admin:criar      # grava o admin na tabela admin_users
+npm run dev
+```
+
+Se preferir sem Docker, instale o Postgres pelo gerenciador de pacotes do seu
+sistema e aponte a `DATABASE_URL` para ele — o efeito é o mesmo.
+
 ---
 
 ## Publicar na Vercel
@@ -135,6 +158,10 @@ um e o motivo de estar desligado.
 ---
 
 ## Segurança
+
+Este checklist foi verificado rodando o sistema contra um Postgres real, não
+só em modo demonstração: as migrações aplicam, o rate limit persiste e bloqueia
+na tentativa esperada, e o descadastro por token grava a data.
 
 - **Senha** com bcrypt (custo 12). Nenhuma credencial no código.
 - **Sessão** em cookie assinado (JWT HS256), `httpOnly`, `secure` em produção,
