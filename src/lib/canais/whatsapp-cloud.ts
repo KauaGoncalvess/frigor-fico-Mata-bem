@@ -22,6 +22,7 @@ import {
 export class CanalWhatsappCloud implements MessageChannel {
   readonly id = "whatsapp_cloud";
   readonly rotulo = "WhatsApp Cloud API (oficial Meta)";
+  readonly requer = "telefone" as const;
 
   private token(): string | null {
     return process.env.WHATSAPP_CLOUD_TOKEN?.trim() || null;

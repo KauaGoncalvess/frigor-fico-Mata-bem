@@ -3,7 +3,7 @@ import { exigirSessao } from "@/lib/admin/guarda";
 import { situacaoDosCanais } from "@/lib/canais";
 import { formatarDataHora } from "@/lib/format";
 import { listarCampanhas } from "@/lib/repo/campanhas";
-import { listarInscritosAtivos } from "@/lib/repo/contatos";
+import { listarInscritosAtivos, listarInscritosWhatsapp } from "@/lib/repo/contatos";
 import { listarDisponiveis } from "@/lib/repo/produtos";
 import { FormularioCampanha } from "./formulario";
 
@@ -14,9 +14,10 @@ export const metadata = { title: "Campanhas" };
 export default async function PaginaCampanhas() {
   await exigirSessao();
 
-  const [produtos, contatos, campanhas] = await Promise.all([
+  const [produtos, contatos, contatosWhatsapp, campanhas] = await Promise.all([
     listarDisponiveis(),
     listarInscritosAtivos(),
+    listarInscritosWhatsapp(),
     listarCampanhas(),
   ]);
 
@@ -34,7 +35,10 @@ export default async function PaginaCampanhas() {
         <FormularioCampanha
           produtos={produtos}
           canais={canais}
-          totalContatos={contatos.length}
+          totalPorRequisito={{
+            email: contatos.length,
+            telefone: contatosWhatsapp.length,
+          }}
         />
 
         <aside className="flex flex-col gap-5">
@@ -57,6 +61,11 @@ export default async function PaginaCampanhas() {
                       {canal.ativo ? "ligado" : "desligado"}
                     </span>
                   </div>
+                  <p className="mt-0.5 text-[11.5px] text-creme-muted">
+                    alcança{" "}
+                    {canal.requer === "telefone" ? contatosWhatsapp.length : contatos.length}{" "}
+                    contato(s)
+                  </p>
                   {canal.motivo && (
                     <p className="mt-1 text-[11.5px] leading-snug text-creme-muted">
                       {canal.motivo}

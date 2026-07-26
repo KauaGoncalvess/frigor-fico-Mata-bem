@@ -90,6 +90,14 @@ export const contatos = pgTable(
     /** LGPD: consentimento explícito, com data e origem registradas. */
     consentimento: boolean("consentimento").notNull().default(false),
     consentimentoEm: timestamp("consentimento_em", { withTimezone: true }),
+    /**
+     * Telefone e consentimento de WhatsApp são separados de propósito.
+     * Consentimento na LGPD é por finalidade: quem aceitou receber e-mail não
+     * autorizou mensagem no WhatsApp. Sem esta marcação, o telefone não é
+     * guardado nem usado.
+     */
+    telefone: text("telefone"),
+    consentimentoWhatsapp: boolean("consentimento_whatsapp").notNull().default(false),
     origem: text("origem").notNull().default("site"),
     tokenDescadastro: text("token_descadastro").notNull(),
     descadastradoEm: timestamp("descadastrado_em", { withTimezone: true }),

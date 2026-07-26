@@ -67,13 +67,6 @@ function perguntarSenha(rotulo: string): Promise<string> {
   });
 }
 
-function validarSenha(senha: string): string | null {
-  if (senha.length < 10) return "A senha precisa ter pelo menos 10 caracteres.";
-  if (!/[a-zA-Z]/.test(senha)) return "A senha precisa ter pelo menos uma letra.";
-  if (!/\d/.test(senha)) return "A senha precisa ter pelo menos um número.";
-  return null;
-}
-
 async function principal() {
   console.log("\n=== Criar administrador do painel ===\n");
 
@@ -86,7 +79,8 @@ async function principal() {
   }
 
   const senha = await perguntarSenha("Senha: ");
-  const erro = validarSenha(senha);
+  const { validarForcaSenha } = await import("../src/lib/auth/senha");
+  const erro = validarForcaSenha(senha);
   if (erro) {
     console.error(`\n${erro}`);
     process.exit(1);

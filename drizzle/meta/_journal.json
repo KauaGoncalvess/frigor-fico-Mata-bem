@@ -15,6 +15,13 @@
       "when": 1785075456416,
       "tag": "0001_entrega-horarios-kits",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785079118026,
+      "tag": "0002_telefone-contatos",
+      "breakpoints": true
     }
   ]
 }

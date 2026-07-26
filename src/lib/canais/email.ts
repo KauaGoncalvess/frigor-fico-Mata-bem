@@ -20,6 +20,7 @@ import {
 export class CanalEmail implements MessageChannel {
   readonly id = "email";
   readonly rotulo = "E-mail";
+  readonly requer = "email" as const;
 
   private cliente: Resend | null = null;
 

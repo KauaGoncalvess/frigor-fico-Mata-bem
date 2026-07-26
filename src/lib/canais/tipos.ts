@@ -43,6 +43,13 @@ export interface MessageChannel {
   readonly id: string;
   readonly rotulo: string;
 
+  /**
+   * Qual dado do contato este canal precisa. É o que define a lista de
+   * destinatários: quem autorizou e-mail não entra num disparo de WhatsApp,
+   * porque consentimento na LGPD é por finalidade.
+   */
+  readonly requer: "email" | "telefone";
+
   /** Ligado por flag E com credenciais presentes. As duas coisas. */
   ativo(): boolean;
 

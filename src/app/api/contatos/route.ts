@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { somenteDigitos } from "@/lib/format";
 import { inscreverContato } from "@/lib/repo/contatos";
 import { ipDaRequisicao, limitar } from "@/lib/seguranca/rate-limit";
 
@@ -9,6 +10,9 @@ const Entrada = z.object({
   consentimento: z.literal(true, {
     message: "É preciso autorizar o envio das ofertas.",
   }),
+  /** Opcional: só serve se vier junto do consentimento de WhatsApp. */
+  telefone: z.string().trim().max(30).optional().default(""),
+  consentimentoWhatsapp: z.boolean().optional().default(false),
   isca: z.string().optional().default(""),
   tempoNaPagina: z.number().optional().default(0),
 });
@@ -40,7 +44,22 @@ export async function POST(req: Request) {
     );
   }
 
-  const { nome, email, isca, tempoNaPagina } = analise.data;
+  const { nome, email, isca, tempoNaPagina, consentimentoWhatsapp } = analise.data;
+
+  // Telefone brasileiro com DDD: 10 ou 11 dígitos (com ou sem o 55 na frente).
+  const digitos = somenteDigitos(analise.data.telefone).replace(/^55/, "");
+  const telefoneValido = digitos.length === 10 || digitos.length === 11;
+
+  if (consentimentoWhatsapp && analise.data.telefone && !telefoneValido) {
+    return NextResponse.json(
+      { mensagem: "Confira o telefone: informe DDD e número." },
+      { status: 400 },
+    );
+  }
+
+  // Sem o consentimento específico o telefone é descartado aqui mesmo.
+  const telefone =
+    consentimentoWhatsapp && telefoneValido ? `55${digitos}` : null;
 
   // Anti-spam: campo isca preenchido, ou formulário enviado rápido demais para
   // alguém ter digitado. Responde como sucesso para não ensinar o bot.
@@ -49,7 +68,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    const resultado = await inscreverContato({ nome, email, origem: "site" });
+    const resultado = await inscreverContato({
+      nome,
+      email,
+      origem: "site",
+      telefone,
+      consentimentoWhatsapp: Boolean(telefone),
+    });
     const mensagem =
       resultado === "ja_inscrito"
         ? "Você já está na nossa lista. Fique de olho no e-mail!"

@@ -11,21 +11,36 @@ import { dispararCampanha } from "./acoes";
 
 const INICIAL: RespostaAcao = { ok: false, mensagem: "" };
 
-type Canal = { id: string; rotulo: string; ativo: boolean; motivo: string | null };
+type Canal = {
+  id: string;
+  rotulo: string;
+  requer: "email" | "telefone";
+  ativo: boolean;
+  motivo: string | null;
+};
 
 export function FormularioCampanha({
   produtos,
   canais,
-  totalContatos,
+  totalPorRequisito,
 }: {
   produtos: Produto[];
   canais: Canal[];
-  totalContatos: number;
+  /** Quantos contatos cada tipo de canal alcança hoje. */
+  totalPorRequisito: { email: number; telefone: number };
 }) {
   const [estado, acao, pendente] = useActionState(dispararCampanha, INICIAL);
   const [confirmando, setConfirmando] = useState(false);
 
   const canaisAtivos = canais.filter((x) => x.ativo);
+  const [canalId, setCanalId] = useState(canaisAtivos[0]?.id ?? "");
+  const canalEscolhido = canaisAtivos.find((x) => x.id === canalId) ?? canaisAtivos[0];
+
+  // O total muda com o canal: quem autorizou e-mail não autorizou WhatsApp.
+  const totalContatos = canalEscolhido
+    ? totalPorRequisito[canalEscolhido.requer]
+    : 0;
+
   const podeEnviar = canaisAtivos.length > 0 && totalContatos > 0;
 
   return (
@@ -56,8 +71,9 @@ export function FormularioCampanha({
           <select
             name="canal"
             required
-            defaultValue={canaisAtivos[0]?.id ?? ""}
-            disabled={!podeEnviar}
+            value={canalId}
+            onChange={(evento) => setCanalId(evento.target.value)}
+            disabled={canaisAtivos.length === 0}
             className="h-12 w-full rounded-xl border border-carvao-700 bg-carvao-850 px-3.5 text-sm text-creme focus:border-ambar-500 focus:outline-none disabled:opacity-60"
           >
             {canaisAtivos.length === 0 ? (
@@ -179,7 +195,9 @@ export function FormularioCampanha({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-[13px] text-creme-muted">
             {totalContatos === 0
-              ? "Nenhum contato ativo na lista ainda."
+              ? canalEscolhido?.requer === "telefone"
+                ? "Ninguém autorizou receber no WhatsApp ainda."
+                : "Nenhum contato ativo na lista ainda."
               : `Vai para ${totalContatos} contato(s) da lista.`}
           </p>
           <button

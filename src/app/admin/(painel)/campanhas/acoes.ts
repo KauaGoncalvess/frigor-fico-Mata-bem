@@ -5,7 +5,7 @@ import { z } from "zod";
 import { exigirSessao, falha, sucesso, type RespostaAcao } from "@/lib/admin/guarda";
 import { obterCanal } from "@/lib/canais";
 import { concluirCampanha, criarCampanha, registrarEnvios } from "@/lib/repo/campanhas";
-import { listarInscritosAtivos } from "@/lib/repo/contatos";
+import { listarInscritosAtivos, listarInscritosWhatsapp } from "@/lib/repo/contatos";
 import { obterProdutosPorIds } from "@/lib/repo/produtos";
 import { limitar } from "@/lib/seguranca/rate-limit";
 
@@ -57,14 +57,18 @@ export async function dispararCampanha(
     .map((valor) => Number(valor))
     .filter((valor) => Number.isInteger(valor));
 
+  // A lista de destinatários sai do que o canal exige, não de uma lista única:
+  // quem autorizou e-mail não autorizou WhatsApp, e vice-versa.
   const [produtos, contatos] = await Promise.all([
     obterProdutosPorIds(produtosIds),
-    listarInscritosAtivos(),
+    canal.requer === "telefone" ? listarInscritosWhatsapp() : listarInscritosAtivos(),
   ]);
 
   if (contatos.length === 0) {
     return falha(
-      "Nenhum contato ativo na lista. Ninguém para receber esta campanha ainda.",
+      canal.requer === "telefone"
+        ? "Nenhum contato autorizou receber mensagem no WhatsApp ainda."
+        : "Nenhum contato ativo na lista. Ninguém para receber esta campanha ainda.",
     );
   }
 
@@ -96,6 +100,7 @@ export async function dispararCampanha(
             id: contato.id,
             nome: contato.nome,
             email: contato.email,
+            telefone: contato.telefone,
             tokenDescadastro: contato.tokenDescadastro,
           },
           mensagem,

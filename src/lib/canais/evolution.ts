@@ -25,6 +25,7 @@ import {
 export class CanalEvolution implements MessageChannel {
   readonly id = "evolution";
   readonly rotulo = "WhatsApp (Evolution API — não oficial)";
+  readonly requer = "telefone" as const;
 
   private base(): string | null {
     return process.env.EVOLUTION_API_URL?.trim().replace(/\/$/, "") || null;

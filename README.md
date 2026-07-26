@@ -153,7 +153,49 @@ implementação e virar uma flag — nada muda no resto do sistema.
 Os dois canais de WhatsApp estão **implementados**, não esboçados: ficam atrás
 de `CANAL_EVOLUTION_ATIVO` e `CANAL_WHATSAPP_CLOUD_ATIVO`, ambos `false`. Sem
 custo e sem risco até alguém decidir ligar. O painel mostra a situação de cada
-um e o motivo de estar desligado.
+um, o motivo de estar desligado e quantos contatos cada um alcança hoje.
+
+**A lista de destinatários é por canal, não uma só.** Cada canal declara de que
+dado ele depende (`requer: "email" | "telefone"`), e o disparo busca só quem
+autorizou aquela finalidade. Na LGPD consentimento é por finalidade: quem
+aceitou receber e-mail não autorizou mensagem no WhatsApp.
+
+Por isso o formulário da loja tem duas caixas separadas. A segunda, opcional,
+libera o campo de telefone — e **sem ela o número nem chega a ser gravado**.
+É o que faz os canais de WhatsApp terem para quem enviar no dia em que forem
+ligados; ligar a flag sem base de telefone não enviaria nada.
+
+---
+
+## Testes
+
+```bash
+npm run build     # a suíte roda contra o build de produção
+npm test
+```
+
+São testes de ponta a ponta com Playwright, em `e2e/`. Cobrem o pedido no
+celular, o passo de quantidade por quilo e por peça, os kits, o atalho de
+recompra, o painel inteiro, a chave da entrega e o checklist de segurança.
+
+Na primeira vez, instale o navegador: `npx playwright install chromium`.
+
+Os testes do painel precisam de credenciais no ambiente — senha de admin não
+entra no repositório, nem de teste:
+
+```bash
+export E2E_ADMIN_EMAIL="voce@sualoja.com.br"
+export E2E_ADMIN_SENHA="sua-senha"
+```
+
+Sem elas, os testes do painel são **pulados com aviso**, em vez de falharem
+por motivo enganoso. A suíte espera o catálogo de exemplo (`npm run db:semear`
+ou o modo demonstração) porque confere cortes com nome conhecido.
+
+Duas decisões que valem saber: o login acontece **uma vez** e a sessão é
+reaproveitada — se cada teste logasse, o rate limit do próprio login reprovaria
+a suíte; e o teste que liga a entrega **restaura o estado no fim**, para não
+deixar a loja prometendo entrega para o teste seguinte.
 
 ---
 
@@ -190,7 +232,10 @@ na tentativa esperada, e o descadastro por token grava a data.
 - **Formulário público** com honeypot e verificação de tempo de preenchimento.
 - **LGPD**: consentimento explícito (checkbox desmarcado), data do
   consentimento registrada, link de descadastro em todo e-mail, página de
-  descadastro por token e base de contatos protegida por sessão.
+  descadastro por token e base de contatos protegida por sessão. Consentimento
+  de e-mail e de WhatsApp são separados, e telefone enviado sem a autorização
+  correspondente é descartado antes de chegar ao banco. O painel tem botão para
+  apagar o contato de vez, que é o direito de exclusão que a política promete.
 
 ---
 

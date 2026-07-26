@@ -17,8 +17,6 @@ export const NOMES_DIA = [
   "sábado",
 ] as const;
 
-const NOMES_CURTOS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"] as const;
-
 /** Semana típica de açougue — ponto de partida para o dono ajustar. */
 export const HORARIO_PADRAO: HorarioDia[] = [
   { dia: 0, fechado: false, abre: "08:00", fecha: "13:00" },
@@ -204,5 +202,3 @@ export function horariosParaSchema(horarios: HorarioDia[] | null | undefined) {
       closes: dia.fecha,
     }));
 }
-
-export { NOMES_CURTOS };

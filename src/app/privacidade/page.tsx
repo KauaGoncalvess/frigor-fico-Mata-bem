@@ -27,7 +27,8 @@ export default async function PaginaPrivacidade() {
           <h2 className="mb-1.5 text-lg font-semibold text-creme">Quais dados coletamos</h2>
           <p>
             Só o que você digita: nome e e-mail, quando se cadastra para receber as ofertas
-            da semana. O pedido montado no site (itens, quantidades e observações) fica
+            da semana. O telefone é guardado apenas se você marcar que também quer
+            receber no WhatsApp — sem essa autorização, o número não é salvo. O pedido montado no site (itens, quantidades e observações) fica
             registrado para o nosso atendimento conferir. Não pedimos CPF, endereço nem
             dados de pagamento neste site.
           </p>
@@ -36,7 +37,9 @@ export default async function PaginaPrivacidade() {
         <section>
           <h2 className="mb-1.5 text-lg font-semibold text-creme">Para que usamos</h2>
           <p>
-            O nome e o e-mail são usados exclusivamente para enviar nossas ofertas. Não
+            O nome e o e-mail são usados exclusivamente para enviar nossas ofertas por
+            e-mail. O telefone, quando autorizado, serve somente para avisar de ofertas no
+            WhatsApp. São autorizações separadas: aceitar uma não liga a outra. Não
             vendemos, alugamos nem compartilhamos sua lista com terceiros para publicidade.
           </p>
         </section>
@@ -56,6 +59,7 @@ export default async function PaginaPrivacidade() {
           <p>
             Todo e-mail que enviamos tem um link de cancelamento no rodapé — um clique e
             você sai da lista. Se preferir que a gente apague seu cadastro por completo,
+            inclusive o telefone,
             fale com a loja pelo WhatsApp{" "}
             {config.telefone ? <>ou pelo telefone {config.telefone}</> : null} e resolvemos.
           </p>

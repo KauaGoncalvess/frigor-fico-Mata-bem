@@ -16,6 +16,10 @@ export function CapturaEmail() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [consentimento, setConsentimento] = useState(false);
+  // Consentimento de WhatsApp é separado: finalidade diferente, autorização
+  // diferente. O campo de telefone só existe depois que a pessoa marca.
+  const [querWhatsapp, setQuerWhatsapp] = useState(false);
+  const [telefone, setTelefone] = useState("");
   const [estado, setEstado] = useState<Estado>("parado");
   const [mensagem, setMensagem] = useState("");
 
@@ -44,6 +48,8 @@ export function CapturaEmail() {
           nome,
           email,
           consentimento,
+          telefone: querWhatsapp ? telefone : "",
+          consentimentoWhatsapp: querWhatsapp,
           isca: iscaRef.current?.value ?? "",
           tempoNaPagina: Date.now() - abertoEm.current,
         }),
@@ -62,6 +68,8 @@ export function CapturaEmail() {
       setNome("");
       setEmail("");
       setConsentimento(false);
+      setQuerWhatsapp(false);
+      setTelefone("");
     } catch {
       setEstado("erro");
       setMensagem("Sem conexão no momento. Tente de novo em instantes.");
@@ -157,6 +165,40 @@ export function CapturaEmail() {
                     momento pelo link no rodapé do e-mail.
                   </span>
                 </label>
+
+                <label className="flex cursor-pointer items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    checked={querWhatsapp}
+                    onChange={(evento) => setQuerWhatsapp(evento.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-brasa-500"
+                  />
+                  <span className="text-[12px] leading-snug text-creme-muted">
+                    Quero receber também{" "}
+                    <strong className="font-semibold text-creme">no WhatsApp</strong>{" "}
+                    (opcional)
+                  </span>
+                </label>
+
+                {querWhatsapp && (
+                  <label className="flex flex-col gap-1.5">
+                    <span className="sr-only">Seu WhatsApp</span>
+                    <input
+                      value={telefone}
+                      onChange={(evento) => setTelefone(evento.target.value)}
+                      type="tel"
+                      inputMode="tel"
+                      maxLength={30}
+                      placeholder="(11) 99999-9999"
+                      autoComplete="tel"
+                      className="h-12 rounded-xl border border-carvao-700 bg-carvao-850 px-3.5 text-sm text-creme placeholder:text-creme-muted/60 focus:border-ambar-500 focus:outline-none"
+                    />
+                    <span className="text-[11px] text-creme-muted">
+                      Guardamos seu número só para avisar das ofertas. Você pode pedir para
+                      sair quando quiser.
+                    </span>
+                  </label>
+                )}
 
                 {estado === "erro" && (
                   <p role="alert" className="text-[12.5px] text-erro">

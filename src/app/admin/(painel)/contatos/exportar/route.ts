@@ -28,14 +28,26 @@ export async function GET() {
   const contatos = await listarContatos();
 
   const linhas = [
-    ["nome", "email", "consentimento", "data_consentimento", "origem", "situacao", "cadastro"]
+    [
+      "nome",
+      "email",
+      "telefone",
+      "consentimento_email",
+      "consentimento_whatsapp",
+      "data_consentimento",
+      "origem",
+      "situacao",
+      "cadastro",
+    ]
       .map(campoCsv)
       .join(","),
     ...contatos.map((contato) =>
       [
         campoCsv(contato.nome),
         campoCsv(contato.email),
+        campoCsv(contato.consentimentoWhatsapp ? (contato.telefone ?? "") : ""),
         campoCsv(contato.consentimento ? "sim" : "nao"),
+        campoCsv(contato.consentimentoWhatsapp ? "sim" : "nao"),
         campoCsv(contato.consentimentoEm?.toISOString() ?? ""),
         campoCsv(contato.origem),
         campoCsv(contato.descadastradoEm ? "descadastrado" : "ativo"),

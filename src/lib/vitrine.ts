@@ -47,10 +47,6 @@ function base(produto: Produto, referencia: Date): ProdutoVitrine {
   };
 }
 
-export function paraVitrine(produto: Produto, referencia = new Date()): ProdutoVitrine {
-  return base(produto, referencia);
-}
-
 /**
  * Monta a vitrine resolvendo os kits.
  *

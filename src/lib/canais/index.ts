@@ -31,6 +31,7 @@ export function situacaoDosCanais() {
   return REGISTRO.map((canal) => ({
     id: canal.id,
     rotulo: canal.rotulo,
+    requer: canal.requer,
     ativo: canal.ativo(),
     motivo: canal.motivoInativo(),
   }));
