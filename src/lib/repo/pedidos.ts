@@ -1,36 +1,51 @@
 import "server-only";
 import { desc, gte } from "drizzle-orm";
 import { bancoConfigurado, db } from "@/lib/db";
-import { pedidos, type ItemPedido, type Pedido } from "@/lib/db/schema";
+import { pedidos, type ItemPedido, type Modalidade, type Pedido } from "@/lib/db/schema";
 import { estadoDemo, proximoIdDemo } from "@/lib/demo/armazem";
 
-export async function registrarPedido(dados: {
+type NovoPedido = {
   itens: ItemPedido[];
+  subtotalCentavos: number;
+  taxaEntregaCentavos: number;
   totalCentavos: number;
   clienteNome?: string | null;
   observacoes?: string | null;
-}): Promise<Pedido> {
+  modalidade: Modalidade;
+  enderecoEntrega?: string | null;
+};
+
+export async function registrarPedido(dados: NovoPedido): Promise<Pedido> {
   if (!bancoConfigurado) {
     const estado = estadoDemo();
     const novo: Pedido = {
       id: proximoIdDemo(),
       itens: dados.itens,
+      subtotalCentavos: dados.subtotalCentavos,
+      taxaEntregaCentavos: dados.taxaEntregaCentavos,
       totalCentavos: dados.totalCentavos,
       clienteNome: dados.clienteNome ?? null,
       observacoes: dados.observacoes ?? null,
+      modalidade: dados.modalidade,
+      enderecoEntrega: dados.enderecoEntrega ?? null,
       canal: "whatsapp",
       criadoEm: new Date(),
     };
     estado.pedidos.unshift(novo);
     return novo;
   }
+
   const [linha] = await db()
     .insert(pedidos)
     .values({
       itens: dados.itens,
+      subtotalCentavos: dados.subtotalCentavos,
+      taxaEntregaCentavos: dados.taxaEntregaCentavos,
       totalCentavos: dados.totalCentavos,
       clienteNome: dados.clienteNome ?? null,
       observacoes: dados.observacoes ?? null,
+      modalidade: dados.modalidade,
+      enderecoEntrega: dados.enderecoEntrega ?? null,
       canal: "whatsapp",
     })
     .returning();

@@ -47,6 +47,7 @@ export async function criarProduto(dados: NovoProduto): Promise<Produto> {
       id: proximoIdDemo(),
       nome: dados.nome,
       categoria: dados.categoria,
+      tipo: dados.tipo ?? "corte",
       precoCentavos: dados.precoCentavos,
       unidade: dados.unidade ?? "kg",
       descricao: dados.descricao ?? null,

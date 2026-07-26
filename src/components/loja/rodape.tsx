@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, MapPin, Phone } from "lucide-react";
 import type { ConfigLoja } from "@/lib/db/schema";
+import { textoDosHorarios } from "@/lib/horario";
 
 /** O lucide-react parou de embarcar ícones de marca, então o glifo vem inline. */
 function IconeInstagram({ size = 15 }: { size?: number }) {
@@ -24,6 +25,10 @@ function IconeInstagram({ size = 15 }: { size?: number }) {
 }
 
 export function Rodape({ config }: { config: ConfigLoja }) {
+  // O horário estruturado manda; o texto livre antigo é só o plano B de quem
+  // ainda não preencheu a grade no painel.
+  const horario = textoDosHorarios(config.horarios) || config.horario;
+
   return (
     <footer className="border-t border-carvao-800 bg-carvao-900/60">
       <div className="mx-auto max-w-6xl px-4 py-12">
@@ -62,7 +67,7 @@ export function Rodape({ config }: { config: ConfigLoja }) {
             </h3>
             <p className="flex items-start gap-2 text-[13px] leading-relaxed text-creme-muted">
               <Clock size={15} className="mt-0.5 shrink-0" />
-              {config.horario}
+              {horario}
             </p>
           </div>
 

@@ -1,4 +1,12 @@
-import type { Campanha, ConfigLoja, Contato, Pedido, Produto } from "@/lib/db/schema";
+import type {
+  Campanha,
+  ConfigLoja,
+  Contato,
+  KitItem,
+  Pedido,
+  Produto,
+} from "@/lib/db/schema";
+import { HORARIO_PADRAO, textoDosHorarios } from "@/lib/horario";
 
 /**
  * Armazém em memória usado quando DATABASE_URL não está configurada.
@@ -23,6 +31,7 @@ function p(
     id,
     nome,
     categoria,
+    tipo: "corte",
     precoCentavos,
     unidade: "kg",
     descricao,
@@ -63,7 +72,9 @@ const PRODUTOS_INICIAIS: Produto[] = [
   }),
   p(10, "Bisteca Suína", "suino", 2490, "Corte com osso, clássico da chapa."),
   p(11, "Panceta Fresca", "suino", 3890, "Barriga suína em manta, para pururuca perfeita."),
-  p(12, "Frango Caipira Inteiro", "aves", 2290, "Criação solta, carne firme e saborosa."),
+  p(12, "Frango Caipira Inteiro", "aves", 4290, "Criação solta, carne firme e saborosa. Peça de 1,5 kg a 2 kg.", {
+    unidade: "un",
+  }),
   p(13, "Coxa e Sobrecoxa", "aves", 1690, "Com pele, ótimo custo-benefício para o dia a dia."),
   p(14, "Filé de Peito de Frango", "aves", 2490, "Limpo, sem pele, embalado em porções."),
   p(15, "Linguiça Toscana Artesanal", "embutidos", 2990, "Produção própria, tripa natural, só pernil e temperos.", {
@@ -76,6 +87,21 @@ const PRODUTOS_INICIAIS: Produto[] = [
   p(18, "Picanha Suína", "suino", 3590, "Alternativa econômica com capa de gordura saborosa.", {
     disponivel: false,
   }),
+  p(19, "Carvão Vegetal 5 kg", "embutidos", 2990, "Saco de 5 kg, queima longa e pouca fumaça.", {
+    unidade: "un",
+  }),
+  // Kit: preço fechado, composição definida em KIT_ITENS_INICIAIS.
+  p(20, "Kit Churrasco 5 Pessoas", "bovino", 13990, "Picanha, fraldinha, linguiça toscana e pão de alho. Sai pronto para a brasa.", {
+    tipo: "kit",
+    unidade: "un",
+    ordem: 0,
+  }),
+];
+
+const KIT_ITENS_INICIAIS: KitItem[] = [
+  { id: 1, kitId: 20, produtoId: 1, quantidade: 1.2 },
+  { id: 2, kitId: 20, produtoId: 4, quantidade: 1 },
+  { id: 3, kitId: 20, produtoId: 15, quantidade: 1 },
 ];
 
 const CONFIG_INICIAL: ConfigLoja = {
@@ -83,17 +109,24 @@ const CONFIG_INICIAL: ConfigLoja = {
   nome: "Frigorífico Mata Bem",
   whatsapp: "5511999999999",
   endereco: "Av. das Carnes, 1200 — Centro, São Paulo/SP",
-  horario: "Segunda a sábado, 8h às 19h · Domingo, 8h às 13h",
+  horario: textoDosHorarios(HORARIO_PADRAO),
   telefone: "(11) 99999-9999",
   instagram: "https://instagram.com",
   facebook: null,
   mapsUrl: "https://maps.google.com/?q=Av.+das+Carnes+1200",
-  entregaTexto: "Entrega em até 2h na região central. Pedido mínimo de R$ 60.",
+  // A loja começa só com retirada no balcão. Nada no site promete entrega
+  // enquanto isto estiver desligado.
+  entregaAtiva: false,
+  entregaTexto: null,
+  taxaEntregaCentavos: null,
+  pedidoMinimoCentavos: null,
+  horarios: HORARIO_PADRAO,
   atualizadoEm: agora(),
 };
 
 type Estado = {
   produtos: Produto[];
+  kitItens: KitItem[];
   contatos: Contato[];
   pedidos: Pedido[];
   campanhas: Campanha[];
@@ -107,6 +140,7 @@ export function estadoDemo(): Estado {
   if (!cache.__demo) {
     cache.__demo = {
       produtos: PRODUTOS_INICIAIS.map((x) => ({ ...x })),
+      kitItens: KIT_ITENS_INICIAIS.map((x) => ({ ...x })),
       contatos: [],
       pedidos: [],
       campanhas: [],

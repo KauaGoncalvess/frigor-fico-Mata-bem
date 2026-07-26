@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import type { ItemPedido } from "@/lib/db/schema";
+import { MODALIDADES, type ItemPedido } from "@/lib/db/schema";
 import { precoEfetivo } from "@/lib/produto";
 import { registrarPedido } from "@/lib/repo/pedidos";
+import { obterConfig } from "@/lib/repo/config";
+import { listarItensDeKits } from "@/lib/repo/kits";
 import { obterProdutosPorIds } from "@/lib/repo/produtos";
 import { ipDaRequisicao, limitar } from "@/lib/seguranca/rate-limit";
 
@@ -18,6 +20,8 @@ const Entrada = z.object({
     .max(60),
   clienteNome: z.string().trim().max(80).nullable().optional(),
   observacoes: z.string().trim().max(400).nullable().optional(),
+  modalidade: z.enum(MODALIDADES).optional().default("retirada"),
+  enderecoEntrega: z.string().trim().max(240).nullable().optional(),
 });
 
 /**
@@ -49,12 +53,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ mensagem: "Pedido inválido." }, { status: 400 });
   }
 
-  const { itens, clienteNome, observacoes } = analise.data;
+  const { itens, clienteNome, observacoes, enderecoEntrega } = analise.data;
 
   try {
-    const produtos = await obterProdutosPorIds(itens.map((x) => x.produtoId));
+    const [produtos, config] = await Promise.all([
+      obterProdutosPorIds(itens.map((x) => x.produtoId)),
+      obterConfig(),
+    ]);
     const porId = new Map(produtos.map((produto) => [produto.id, produto]));
     const agora = new Date();
+
+    // Modalidade também não se confia ao cliente: se a loja não faz entrega,
+    // o pedido é registrado como retirada, não importa o que veio no JSON.
+    const modalidade = config.entregaAtiva ? analise.data.modalidade : "retirada";
+
+    // Composição dos kits, congelada no pedido para o histórico não depender
+    // de o kit continuar existindo do mesmo jeito depois.
+    const idsDeKits = produtos.filter((x) => x.tipo === "kit").map((x) => x.id);
+    const itensDeKits = await listarItensDeKits(idsDeKits);
 
     const itensPedido: ItemPedido[] = [];
     for (const item of itens) {
@@ -62,6 +78,19 @@ export async function POST(req: Request) {
       if (!produto) continue; // produto saiu do ar entre a escolha e o envio
 
       const preco = precoEfetivo(produto, agora);
+
+      let composicao: string | undefined;
+      if (produto.tipo === "kit") {
+        const partes = itensDeKits
+          .filter((x) => x.kitId === produto.id)
+          .map((x) => {
+            const peca = porId.get(x.produtoId);
+            return peca ? `${x.quantidade} ${peca.unidade} ${peca.nome}` : null;
+          })
+          .filter(Boolean);
+        if (partes.length > 0) composicao = partes.join(" · ");
+      }
+
       itensPedido.push({
         produtoId: produto.id,
         nome: produto.nome,
@@ -69,6 +98,7 @@ export async function POST(req: Request) {
         unidade: produto.unidade,
         precoUnitarioCentavos: preco,
         subtotalCentavos: Math.round(preco * item.quantidade),
+        ...(composicao ? { composicao } : {}),
       });
     }
 
@@ -79,13 +109,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const totalCentavos = itensPedido.reduce((soma, x) => soma + x.subtotalCentavos, 0);
+    const subtotalCentavos = itensPedido.reduce((soma, x) => soma + x.subtotalCentavos, 0);
+    const taxaEntregaCentavos =
+      modalidade === "entrega" ? (config.taxaEntregaCentavos ?? 0) : 0;
+    const totalCentavos = subtotalCentavos + taxaEntregaCentavos;
 
     const pedido = await registrarPedido({
       itens: itensPedido,
+      subtotalCentavos,
+      taxaEntregaCentavos,
       totalCentavos,
       clienteNome: clienteNome ?? null,
       observacoes: observacoes ?? null,
+      modalidade,
+      enderecoEntrega: modalidade === "entrega" ? (enderecoEntrega ?? null) : null,
     });
 
     return NextResponse.json({ id: pedido.id, totalCentavos });

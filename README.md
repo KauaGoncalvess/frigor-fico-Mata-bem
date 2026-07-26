@@ -4,10 +4,23 @@ Site de vendas para frigorífico/açougue: o cliente monta o pedido no site e
 envia pronto para o WhatsApp da loja. O dono cuida de cortes, preços, ofertas e
 comunicação num painel separado, sem precisar de código.
 
-- **Loja** (`/`) — vitrine, catálogo com busca e filtro, carrinho sempre à vista
-  e fechamento no WhatsApp.
-- **Painel** (`/admin`) — login, dashboard, cadastro de produtos, ofertas da
-  semana, base de contatos e disparo de campanhas.
+- **Loja** (`/`) — vitrine, catálogo com busca e filtro, kits prontos, carrinho
+  sempre à vista, atalho de recompra e fechamento no WhatsApp.
+- **Painel** (`/admin`) — login, dashboard, cadastro de produtos e kits, ofertas
+  da semana, histórico de pedidos, base de contatos e disparo de campanhas.
+
+## Retirada hoje, entrega quando quiser
+
+A loja opera **só com retirada no balcão**, e o site inteiro fala essa língua:
+nenhum texto promete entrega. A entrega está implementada e desligada por uma
+chave em **Painel → Minha loja → Também fazemos entrega**. Ao ligar, aparecem
+a escolha "retirar / receber em casa" no carrinho, o campo de endereço, a taxa
+somada ao total e o aviso de quanto falta para o pedido mínimo — e a modalidade
+passa a viajar na mensagem do WhatsApp.
+
+Prometer entrega antes de a entrega existir é o jeito mais rápido de queimar a
+confiança na primeira compra; por isso a chave começa desligada e o servidor
+ignora pedido marcado como entrega enquanto ela estiver assim.
 
 ---
 
@@ -67,6 +80,28 @@ Use a connection string **com pooler** do Neon (o host tem `-pooler` no nome):
 é a que aguenta o modelo serverless da Vercel.
 
 ---
+
+## O que ajuda a vender
+
+- **Kits com preço fechado.** Um kit é composto por cortes reais com
+  quantidade; o site mostra a composição e calcula a economia frente às peças
+  avulsas. Se qualquer peça acaba, o kit sai da loja sozinho — melhor sumir do
+  que o cliente descobrir a falta no balcão. No cadastro, o painel avisa se o
+  kit ficou mais caro que a soma das peças.
+- **Repetir último pedido.** O pedido anterior fica no aparelho do cliente (só
+  id e quantidade, nunca preço) e o atalho remonta o carrinho com os preços de
+  hoje, avisando o que saiu de estoque. Carne é compra semanal e quase sempre
+  a mesma.
+- **Venda por quilo ou por peça.** Frango inteiro, carvão e bandeja se vendem
+  por unidade; o botão +/- respeita isso (0,5 kg para peso, 1 un para peça).
+- **Aberto ou fechado agora.** Horário estruturado por dia da semana, calculado
+  no fuso da loja — não no do visitante. Fora do horário, o cliente vê quando a
+  loja abre em vez de mandar pedido no vazio.
+- **Achado no Google e no WhatsApp.** JSON-LD de loja local com endereço,
+  telefone e horário; `sitemap`, `robots` e imagem de preview gerada, para o
+  link não cair no grupo da família como um retângulo cinza.
+- **Ícone na tela inicial.** Manifest e ícones prontos: um toque para pedir de
+  novo, sem procurar link.
 
 ## Fotos dos produtos
 
@@ -147,6 +182,10 @@ entrega.
 e o painel continua mostrando a oferta vencida para o dono resolver, em vez de
 sumir silenciosamente.
 
+**Modalidade também não se confia ao cliente.** Assim como o preço, a
+modalidade é decidida no servidor: com a entrega desligada, um pedido marcado
+como entrega no JSON é registrado como retirada.
+
 ---
 
 ## Estrutura
@@ -155,6 +194,9 @@ sumir silenciosamente.
 src/
   app/
     page.tsx                 loja
+    sitemap.ts robots.ts     descoberta em busca
+    opengraph-image.tsx      preview ao compartilhar o link
+    manifest.ts apple-icon   instalação na tela inicial
     admin/login/             entrada do painel
     admin/(painel)/          área logada (guarda no layout)
     api/                     contatos, pedidos, upload
@@ -165,6 +207,7 @@ src/
     db/                      schema e conexão
     repo/                    acesso a dados (com fallback demo)
     auth/                    senha, token e sessão
+    horario.ts               aberto/fechado no fuso da loja
     seguranca/               rate limiting
 scripts/                     criar admin, semear banco
 drizzle/                     migrações

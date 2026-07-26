@@ -1,28 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check, Minus, Package, Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { formatarPreco } from "@/lib/format";
+import { formatarPreco, formatarQuantidade } from "@/lib/format";
 import type { ProdutoVitrine } from "@/lib/vitrine";
 import { ArteCorte } from "./arte-corte";
-import { PASSO_KG, useCarrinho } from "./carrinho-contexto";
+import { passoDaUnidade, useCarrinho } from "./carrinho-contexto";
 
 export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
   const { adicionar, definirQuantidade, quantidadeDe } = useCarrinho();
   const quantidade = quantidadeDe(produto.id);
   const noCarrinho = quantidade > 0;
+  const passo = passoDaUnidade(produto.unidade);
+  const ehKit = produto.tipo === "kit";
 
   const adicionarAoCarrinho = () => {
-    adicionar(
-      {
-        produtoId: produto.id,
-        nome: produto.nome,
-        unidade: produto.unidade,
-        precoUnitarioCentavos: produto.precoEfetivoCentavos,
-      },
-      PASSO_KG * 2,
-    );
+    adicionar({
+      produtoId: produto.id,
+      nome: produto.nome,
+      unidade: produto.unidade,
+      precoUnitarioCentavos: produto.precoEfetivoCentavos,
+    });
   };
 
   return (
@@ -31,6 +30,7 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
         "group relative flex flex-col overflow-hidden rounded-card borda-fina bg-carvao-900",
         "transition-[transform,box-shadow,border-color] duration-300 will-change-transform",
         "hover:-translate-y-1 hover:border-carvao-500 hover:shadow-lift",
+        ehKit && "border-ambar-500/30",
         !produto.disponivel && "opacity-60",
       )}
     >
@@ -59,6 +59,13 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
           </span>
         )}
 
+        {ehKit && !produto.emOferta && (
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-ambar-500 px-2 py-0.5 text-[11px] font-bold text-carvao-950 shadow-sm">
+            <Package size={11} strokeWidth={2.8} />
+            Kit
+          </span>
+        )}
+
         {!produto.disponivel && (
           <span className="absolute right-2 top-2 rounded-full bg-carvao-950/90 px-2 py-0.5 text-[11px] font-semibold text-creme-muted">
             Esgotado
@@ -71,10 +78,16 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
           <h3 className="text-[15px] leading-snug font-semibold text-creme">
             {produto.nome}
           </h3>
-          {produto.descricao && (
-            <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-creme-muted">
-              {produto.descricao}
+          {produto.composicao ? (
+            <p className="mt-1 line-clamp-3 text-[11.5px] leading-snug text-ambar-400/90">
+              {produto.composicao}
             </p>
+          ) : (
+            produto.descricao && (
+              <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-creme-muted">
+                {produto.descricao}
+              </p>
+            )
           )}
         </div>
 
@@ -82,7 +95,7 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
           <span className="font-display text-[22px] font-semibold leading-none text-ambar-400">
             {formatarPreco(produto.precoEfetivoCentavos)}
           </span>
-          <span className="text-[11px] text-creme-muted">/{produto.unidade}</span>
+          {!ehKit && <span className="text-[11px] text-creme-muted">/{produto.unidade}</span>}
           {produto.emOferta && (
             <span className="ml-auto text-[12px] text-creme-muted line-through">
               {formatarPreco(produto.precoCentavos)}
@@ -90,26 +103,32 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
           )}
         </div>
 
+        {ehKit && produto.economiaCentavos > 0 && (
+          <p className="-mt-1 text-[11.5px] font-semibold text-sucesso">
+            Economize {formatarPreco(produto.economiaCentavos)}
+          </p>
+        )}
+
         {!produto.disponivel ? (
           <p className="rounded-lg bg-carvao-850 px-3 py-2 text-center text-[12px] text-creme-muted">
-            Sem estoque hoje
+            {ehKit ? "Kit indisponível hoje" : "Sem estoque hoje"}
           </p>
         ) : noCarrinho ? (
           <div className="flex items-center justify-between rounded-lg bg-carvao-800 p-1">
             <button
               type="button"
-              onClick={() => definirQuantidade(produto.id, quantidade - PASSO_KG)}
+              onClick={() => definirQuantidade(produto.id, quantidade - passo)}
               aria-label={`Diminuir ${produto.nome}`}
               className="grid h-8 w-8 place-items-center rounded-md text-creme transition hover:bg-carvao-700 active:scale-95"
             >
               <Minus size={16} />
             </button>
             <span className="text-[13px] font-semibold tabular-nums text-creme">
-              {quantidade.toString().replace(".", ",")} {produto.unidade}
+              {formatarQuantidade(quantidade, produto.unidade)}
             </span>
             <button
               type="button"
-              onClick={() => definirQuantidade(produto.id, quantidade + PASSO_KG)}
+              onClick={() => definirQuantidade(produto.id, quantidade + passo)}
               aria-label={`Aumentar ${produto.nome}`}
               className="grid h-8 w-8 place-items-center rounded-md bg-brasa-600 text-white transition hover:bg-brasa-500 active:scale-95"
             >

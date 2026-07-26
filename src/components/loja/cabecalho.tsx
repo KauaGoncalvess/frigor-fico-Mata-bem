@@ -1,8 +1,21 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import type { HorarioDia } from "@/lib/db/schema";
+import type { SituacaoLoja } from "@/lib/horario";
 import { linkWhatsapp } from "@/lib/whatsapp";
+import { SeloHorario } from "./selo-horario";
 
-export function Cabecalho({ nomeLoja, whatsapp }: { nomeLoja: string; whatsapp: string }) {
+export function Cabecalho({
+  nomeLoja,
+  whatsapp,
+  horarios,
+  situacao,
+}: {
+  nomeLoja: string;
+  whatsapp: string;
+  horarios: HorarioDia[] | null;
+  situacao: SituacaoLoja;
+}) {
   const link = linkWhatsapp(whatsapp, `Olá! Vim pelo site do ${nomeLoja}.`);
 
   return (
@@ -23,6 +36,7 @@ export function Cabecalho({ nomeLoja, whatsapp }: { nomeLoja: string; whatsapp: 
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-4">
+          <SeloHorario horarios={horarios} inicial={situacao} className="hidden md:inline-flex" />
           <Link
             href="#ofertas"
             className="hidden rounded-lg px-3 py-2 text-[13px] font-medium text-creme-muted transition hover:text-creme sm:block"

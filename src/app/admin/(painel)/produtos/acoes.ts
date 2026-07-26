@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { exigirSessao, falha, sucesso, type RespostaAcao } from "@/lib/admin/guarda";
-import { CATEGORIAS } from "@/lib/db/schema";
+import { CATEGORIAS, TIPOS_PRODUTO, UNIDADES } from "@/lib/db/schema";
 import { analisarPreco } from "@/lib/format";
+import { excluirItensDoKit, salvarItensDoKit } from "@/lib/repo/kits";
 import {
   atualizarProduto,
   criarProduto,
@@ -28,8 +29,9 @@ const Formulario = z.object({
   id: Texto.optional(),
   nome: Texto.min(2, "Escreva o nome do corte.").max(120),
   categoria: z.enum(CATEGORIAS, { message: "Escolha uma categoria." }),
-  preco: Texto.min(1, "Informe o preço por quilo."),
-  unidade: Texto.default("kg"),
+  tipo: z.enum(TIPOS_PRODUTO).optional().default("corte"),
+  preco: Texto.min(1, "Informe o preço."),
+  unidade: z.enum(UNIDADES, { message: "Escolha a unidade de venda." }).optional().default("kg"),
   descricao: Texto.max(400, "A descrição ficou longa demais.").optional().default(""),
   imagemUrl: Texto.max(600).optional().default(""),
   imagemPublicId: Texto.max(300).optional().default(""),
@@ -88,11 +90,33 @@ export async function salvarProduto(
     }
   }
 
+  // Kit sempre é vendido por peça: meio kit não existe.
+  const unidade = dados.tipo === "kit" ? "un" : dados.unidade;
+
+  // Composição do kit vem em dois campos paralelos do formulário.
+  const componentes = formData
+    .getAll("kitProdutoId")
+    .map((valor, indice) => ({
+      produtoId: Number(valor),
+      quantidade: Number(
+        String(formData.getAll("kitQuantidade")[indice] ?? "").replace(",", "."),
+      ),
+    }))
+    .filter((x) => Number.isInteger(x.produtoId) && x.produtoId > 0 && x.quantidade > 0);
+
+  if (dados.tipo === "kit" && componentes.length === 0) {
+    return falha(
+      "Um kit precisa de pelo menos um corte na composição — o cliente tem que saber o que está levando.",
+      "kit",
+    );
+  }
+
   const valores = {
     nome: dados.nome,
     categoria: dados.categoria,
+    tipo: dados.tipo,
     precoCentavos,
-    unidade: dados.unidade || "kg",
+    unidade,
     descricao: dados.descricao || null,
     imagemUrl: dados.imagemUrl || null,
     imagemPublicId: dados.imagemPublicId || null,
@@ -103,13 +127,24 @@ export async function salvarProduto(
   };
 
   try {
+    let idSalvo: number;
+
     if (dados.id) {
       const id = Number(dados.id);
       if (!Number.isInteger(id)) return falha("Produto não encontrado.");
       const atualizado = await atualizarProduto(id, valores);
       if (!atualizado) return falha("Esse produto não existe mais.");
+      idSalvo = atualizado.id;
     } else {
-      await criarProduto(valores);
+      const criado = await criarProduto(valores);
+      idSalvo = criado.id;
+    }
+
+    if (dados.tipo === "kit") {
+      await salvarItensDoKit(idSalvo, componentes);
+    } else {
+      // Deixou de ser kit: a composição antiga não pode ficar pendurada.
+      await excluirItensDoKit(idSalvo);
     }
   } catch {
     return falha("Não deu para salvar agora. Tente de novo em instantes.");
@@ -123,6 +158,7 @@ export async function apagarProduto(formData: FormData): Promise<void> {
   await exigirSessao();
   const id = Number(formData.get("id"));
   if (!Number.isInteger(id)) return;
+  await excluirItensDoKit(id);
   await excluirProduto(id);
   revalidarTudo();
   redirect("/admin/produtos?apagado=1");

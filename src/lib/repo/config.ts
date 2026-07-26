@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { bancoConfigurado, db } from "@/lib/db";
 import { configLoja, type ConfigLoja } from "@/lib/db/schema";
 import { estadoDemo } from "@/lib/demo/armazem";
+import { HORARIO_PADRAO } from "@/lib/horario";
 
 const PADRAO: ConfigLoja = {
   id: 1,
@@ -14,7 +15,11 @@ const PADRAO: ConfigLoja = {
   instagram: null,
   facebook: null,
   mapsUrl: null,
+  entregaAtiva: false,
   entregaTexto: null,
+  taxaEntregaCentavos: null,
+  pedidoMinimoCentavos: null,
+  horarios: HORARIO_PADRAO,
   atualizadoEm: new Date(),
 };
 

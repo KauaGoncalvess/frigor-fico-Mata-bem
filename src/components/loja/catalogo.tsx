@@ -9,6 +9,7 @@ import { ProdutoCard } from "./produto-card";
 
 const FILTROS: { id: string; rotulo: string }[] = [
   { id: "todos", rotulo: "Todos" },
+  { id: "kits", rotulo: "Kits" },
   { id: "bovino", rotulo: ROTULO_CATEGORIA.bovino },
   { id: "suino", rotulo: ROTULO_CATEGORIA.suino },
   { id: "aves", rotulo: ROTULO_CATEGORIA.aves },
@@ -29,9 +30,10 @@ export function Catalogo({ produtos }: { produtos: ProdutoVitrine[] }) {
   const [busca, setBusca] = useState("");
 
   const contagens = useMemo(() => {
-    const mapa: Record<string, number> = { todos: produtos.length };
+    const mapa: Record<string, number> = { todos: produtos.length, kits: 0 };
     for (const produto of produtos) {
       mapa[produto.categoria] = (mapa[produto.categoria] ?? 0) + 1;
+      if (produto.tipo === "kit") mapa.kits += 1;
     }
     return mapa;
   }, [produtos]);
@@ -39,11 +41,16 @@ export function Catalogo({ produtos }: { produtos: ProdutoVitrine[] }) {
   const visiveis = useMemo(() => {
     const termo = normalizar(busca);
     return produtos.filter((produto) => {
-      if (categoria !== "todos" && produto.categoria !== categoria) return false;
+      // "Kits" corta por tipo, não por categoria de carne.
+      if (categoria === "kits" && produto.tipo !== "kit") return false;
+      if (categoria !== "todos" && categoria !== "kits" && produto.categoria !== categoria) {
+        return false;
+      }
       if (!termo) return true;
       return (
         normalizar(produto.nome).includes(termo) ||
         normalizar(produto.descricao ?? "").includes(termo) ||
+        normalizar(produto.composicao ?? "").includes(termo) ||
         normalizar(ROTULO_CATEGORIA[produto.categoria as Categoria] ?? "").includes(termo)
       );
     });
