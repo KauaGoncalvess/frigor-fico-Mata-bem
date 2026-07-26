@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Design system — "premium açougue artesanal"
+   Paleta escura com acentos quentes (brasa, âmbar, bordô) sobre neutros.
+   ------------------------------------------------------------------ */
+@theme {
+  /* Neutros quentes (base carvão / carne selada) */
+  --color-carvao-950: #0a0706;
+  --color-carvao-900: #120d0a;
+  --color-carvao-850: #191210;
+  --color-carvao-800: #221916;
+  --color-carvao-700: #2f231e;
+  --color-carvao-600: #40302a;
+  --color-carvao-500: #5c473f;
+
+  /* Texto */
+  --color-creme: #f6efe6;
+  --color-creme-muted: #b7a89b;
+
+  /* Acentos quentes */
+  --color-brasa-600: #c2371a;
+  --color-brasa-500: #e04b23;
+  --color-brasa-400: #f26134;
+  --color-ambar-500: #e9a13b;
+  --color-ambar-400: #f5b855;
+  --color-bordo-800: #5d0f1c;
+  --color-bordo-700: #7a1424;
+  --color-bordo-600: #9a1b2e;
+
+  /* Semânticos */
+  --color-sucesso: #4f9d69;
+  --color-alerta: #e0a83b;
+  --color-erro: #d9534f;
+
+  --font-display: var(--font-fraunces), "Georgia", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 14px;
+
+  --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.7);
+  --shadow-glow: 0 0 0 1px rgb(233 161 59 / 0.25), 0 18px 46px -18px rgb(224 75 35 / 0.55);
+
+  --animate-brasa: brasa 7s ease-in-out infinite alternate;
+}
+
+@keyframes brasa {
+  from {
+    opacity: 0.55;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0.85;
+    transform: translate3d(0, -2%, 0) scale(1.08);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-carvao-950);
+    color: var(--color-creme);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 20, "WONK" 1;
+    letter-spacing: -0.015em;
+  }
+
+  ::selection {
+    background: var(--color-brasa-500);
+    color: #fff;
+  }
+
+  /* Foco visível e consistente — acessibilidade */
+  :focus-visible {
+    outline: 2px solid var(--color-ambar-400);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+
+  /* Evita zoom automático no iOS em campos de formulário */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+@layer utilities {
+  .texto-marmore {
+    background: linear-gradient(
+      100deg,
+      var(--color-creme) 0%,
+      var(--color-ambar-400) 45%,
+      var(--color-brasa-400) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .borda-fina {
+    border: 1px solid color-mix(in oklab, var(--color-carvao-600) 70%, transparent);
+  }
+
+  .vidro {
+    background: color-mix(in oklab, var(--color-carvao-900) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* Textura sutil — dá profundidade sem custo de imagem */
+  .grao::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgb(255 255 255 / 0.045) 1px,
+      transparent 0
+    );
+    background-size: 3px 3px;
+  }
+
+  .rolagem-oculta {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .rolagem-oculta::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Respeita quem pediu menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,58 @@
+import { formatarPreco, formatarQuantidade, somenteDigitos } from "@/lib/format";
+
+export type ItemMensagem = {
+  nome: string;
+  quantidade: number;
+  unidade: string;
+  precoUnitarioCentavos: number;
+};
+
+/**
+ * Monta o texto do pedido já pronto para o WhatsApp da loja.
+ * O total é ESTIMADO: carne é vendida por peso e a peça real varia — deixar
+ * isso explícito na mensagem evita discussão na entrega.
+ */
+export function montarMensagemPedido(dados: {
+  nomeLoja: string;
+  itens: ItemMensagem[];
+  totalCentavos: number;
+  clienteNome?: string;
+  observacoes?: string;
+}): string {
+  const linhas: string[] = [];
+
+  linhas.push(`*Novo pedido — ${dados.nomeLoja}*`);
+  linhas.push("");
+
+  if (dados.clienteNome?.trim()) {
+    linhas.push(`*Cliente:* ${dados.clienteNome.trim()}`);
+    linhas.push("");
+  }
+
+  linhas.push("*Itens:*");
+  for (const item of dados.itens) {
+    const subtotal = Math.round(item.precoUnitarioCentavos * item.quantidade);
+    linhas.push(
+      `• ${item.nome} — ${formatarQuantidade(item.quantidade, item.unidade)} × ${formatarPreco(
+        item.precoUnitarioCentavos,
+      )} = ${formatarPreco(subtotal)}`,
+    );
+  }
+
+  linhas.push("");
+  linhas.push(`*Total estimado:* ${formatarPreco(dados.totalCentavos)}`);
+  linhas.push("_O valor final depende do peso exato das peças._");
+
+  if (dados.observacoes?.trim()) {
+    linhas.push("");
+    linhas.push(`*Observações:* ${dados.observacoes.trim()}`);
+  }
+
+  return linhas.join("\n");
+}
+
+/** Link universal do WhatsApp — funciona no app do celular e no WhatsApp Web. */
+export function linkWhatsapp(numero: string, mensagem: string): string {
+  const destino = somenteDigitos(numero);
+  return `https://wa.me/${destino}?text=${encodeURIComponent(mensagem)}`;
+}
