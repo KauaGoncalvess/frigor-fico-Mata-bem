@@ -21,7 +21,7 @@ export function DadosEstruturados({ url }: { url: string }) {
     email: EMPRESA.email,
     foundingDate: "2004",
     description:
-      "Frigorífico com Inspeção Federal permanente (SIF 4127) em Sete Lagoas/MG. " +
+      "Frigorífico com Inspeção Federal permanente em Sete Lagoas/MG. " +
       "Abate de bovinos e suínos, industrialização e preparação de subprodutos.",
     address: {
       "@type": "PostalAddress",

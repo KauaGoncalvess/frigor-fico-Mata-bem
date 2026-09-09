@@ -69,7 +69,7 @@ export default function OpenGraphImage() {
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          SIF 4127 · Inspeção federal permanente
+          Inspeção federal permanente · Sete Lagoas MG
         </div>
       </div>
     ),

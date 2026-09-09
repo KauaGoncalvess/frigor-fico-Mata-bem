@@ -55,18 +55,29 @@ inspecionado vale mais que imagem genérica de rebanho.
 
 ## Antes de publicar
 
-Os dados regulatórios da seção "O rigor" vieram de pesquisa em fontes públicas
-(SEMAD/MG, FIEMG, relação CNA do protocolo Wagyu), **não da empresa**. Em
-`src/conteudo/empresa.ts` cada evidência carrega `confirmado: false`.
+Os dados regulatórios vieram de pesquisa em fontes públicas, **não da empresa**.
+Em `src/conteudo/empresa.ts` cada evidência carrega `confirmado: false`.
 
-Confirmar com o cliente antes de ir ao ar:
+### Confere com a pesquisa pública
 
-- SIF 4127 e a inspeção federal permanente
-- Licenciamento ambiental LAC 2 (deferido em 26/05/2023) e validade até 22/02/2031
-- A afirmação de ter sido o primeiro de Minas a certificar Wagyu
-- Ano de fundação: o cadastro diz 2004, mas há parecer ambiental de 2021 que
-  menciona atuação no local desde 1995
-- Os 6.000 m² de área construída
+CNPJ, razão social, endereço, telefone (31) 2106-3355, fundação em 24/09/2004,
+abate de bovinos e suínos, atendimento a casas de carnes, supermercados e
+distribuidores, e a presença na lista de frigoríficos credenciados ao protocolo
+de carne Wagyu certificada.
+
+### Não confere — precisa do dono
+
+- **Número do SIF.** O briefing trazia SIF 4127; a pesquisa pública associa este
+  frigorífico ao **SIF 585**. Por isso o número **não aparece na página**: a seção
+  "O rigor" afirma apenas "Inspeção Federal permanente na unidade". Confirmado o
+  número correto, é uma linha em `EVIDENCIAS` para ele voltar.
+- **Segundo telefone.** Um diretório lista (31) 3773-26xx além do número em uso.
+- **Área construída de 6.000 m²** — sem confirmação fora da apresentação da FIEMG.
+- **Licenciamento ambiental** LAC 2 deferido em 26/05/2023 e validade até 22/02/2031.
+- **"Primeiro de Minas a certificar Wagyu"** — a página já atribui à FIEMG no corpo
+  do texto, mas o título afirma seco.
+- **Ano de fundação.** O cadastro diz 2004; há parecer ambiental de 2021 que
+  menciona atuação no local desde 1995.
 
 Para uma empresa sob inspeção federal, um número errado no site é pior que
 número nenhum.

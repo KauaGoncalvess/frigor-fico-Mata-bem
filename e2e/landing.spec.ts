@@ -36,7 +36,11 @@ test("o telefone é clicável e é o CTA da página", async ({ page }) => {
 test("as evidências de inspeção estão na página", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByText("SIF 4127 — inspeção federal permanente")).toBeVisible();
+  await expect(page.getByText("Inspeção Federal permanente na unidade")).toBeVisible();
+
+  // O número do SIF está em disputa (briefing diz 4127, pesquisa diz 585).
+  // Enquanto não for confirmado, não pode aparecer em lugar nenhum.
+  await expect(page.getByText(/SIF\s*4127/)).toHaveCount(0);
   await expect(page.getByText(/DIPOA/).first()).toBeVisible();
   await expect(page.getByText("Válido até 22/02/2031")).toBeVisible();
 });

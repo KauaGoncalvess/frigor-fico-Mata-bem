@@ -66,7 +66,7 @@ export const PLANTA = {
     },
     {
       valor: "SIF",
-      unidade: "4127 · inspeção permanente",
+      unidade: "inspeção permanente",
       nota: "Registro no DIPOA, com Serviço de Inspeção Federal presente na unidade.",
     },
     {
@@ -98,8 +98,8 @@ export const WAGYU = {
     "Segundo a FIEMG, o Frigorífico Mata Bem foi a primeira empresa a possuir certificação " +
     "pela Associação Brasileira dos Criadores de Bovinos da Raça Wagyu em Minas Gerais.",
   nota:
-    "A relação de 2025 de frigoríficos credenciados ao protocolo de carne Wagyu certificada " +
-    "registra SIF 4127 — Sete Lagoas/MG.",
+    "A relação de frigoríficos credenciados ao protocolo de carne Wagyu certificada " +
+    "registra a unidade de Sete Lagoas/MG.",
   galeria: [
     { alt: "Bovinos em pastagem" },
     { alt: "Rebanho ao pôr do sol" },
@@ -117,7 +117,11 @@ export const RIGOR = {
 export const EVIDENCIAS = [
   {
     rotulo: "Registro sanitário",
-    valor: "SIF 4127 — inspeção federal permanente",
+    // O número saiu do ar de propósito. O briefing trazia SIF 4127, mas a
+    // pesquisa pública associa este frigorífico ao SIF 585. Enquanto o dono
+    // não disser qual é o correto, a página afirma só o que é incontroverso:
+    // que há inspeção federal permanente na unidade.
+    valor: "Inspeção Federal permanente na unidade",
     fonte: "FIEMG / DIPOA",
     confirmado: false,
   },
