@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 /**
  * Os elementos fixos que emolduram a página: grão de filme, barra de progresso
- * da leitura, indicador do capítulo atual e o atalho para o contato.
+ * da leitura e o indicador do capítulo atual. A navegação é do cabeçalho.
  *
  * Tudo num só componente porque compartilham o mesmo listener de rolagem —
  * throttled em requestAnimationFrame para não disputar quadro com o parallax.
@@ -73,12 +73,6 @@ export function Cromados() {
         <span className="rotulo text-osso/60 mix-blend-difference">{capitulo}</span>
       </div>
 
-      <a
-        href="#contato"
-        className="rotulo fixed top-5 right-[clamp(14px,3vw,34px)] z-93 border border-osso/30 bg-noite-950/50 px-[18px] py-2.5 text-osso backdrop-blur-[10px] transition-colors duration-300 hover:border-terra-500 hover:bg-terra-500"
-      >
-        Contato
-      </a>
     </>
   );
 }

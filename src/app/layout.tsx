@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Space_Grotesk } from "next/font/google";
-import { EMPRESA } from "@/conteudo/empresa";
+import { Cabecalho } from "@/components/site/cabecalho";
+import { Cromados } from "@/components/site/cromados";
+import { DadosEstruturados } from "@/components/site/dados-estruturados";
+import { Rodape } from "@/components/site/rodape";
 import { urlDoSite } from "@/lib/url";
 import "./globals.css";
 
 // A serifada só existe em 400, e o itálico é usado nos numerais de capítulo
-// e no destaque de "Wagyu" — por isso as duas variações entram.
+// e nos destaques — por isso as duas variações entram.
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
@@ -25,8 +28,8 @@ export const metadata: Metadata = {
   // Sem isto o Next resolve a imagem de compartilhamento contra localhost.
   metadataBase: new URL(urlDoSite()),
   title: {
-    default: "Frigorífico Mata Bem — Abate e processamento com SIF em Sete Lagoas",
-    template: `%s · ${EMPRESA.razaoSocial}`,
+    default: "Frigorífico Mata Bem — Abate e processamento em Sete Lagoas",
+    template: "%s · Frigorífico Mata Bem",
   },
   description:
     "Frigorífico com Inspeção Federal permanente em Sete Lagoas/MG. Abate de bovinos e " +
@@ -54,7 +57,13 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${instrumentSerif.variable} ${spaceGrotesk.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <DadosEstruturados url={urlDoSite()} />
+        <Cromados />
+        <Cabecalho />
+        <main>{children}</main>
+        <Rodape />
+      </body>
     </html>
   );
 }

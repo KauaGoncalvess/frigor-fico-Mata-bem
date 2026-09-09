@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
+import { MENU } from "@/conteudo/navegacao";
 import { urlDoSite } from "@/lib/url";
 
-// Uma página só: institucional, conteúdo estável.
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: urlDoSite(),
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-  ];
+  const base = urlDoSite();
+  const agora = new Date();
+
+  return MENU.map((item) => ({
+    url: item.href === "/" ? base : `${base}${item.href}`,
+    lastModified: agora,
+    changeFrequency: "monthly" as const,
+    priority: item.href === "/" ? 1 : 0.7,
+  }));
 }

@@ -1,32 +1,29 @@
-import { Abertura } from "@/components/site/abertura";
-import { Contato, Rodape } from "@/components/site/contato";
-import { Cromados } from "@/components/site/cromados";
-import { DadosEstruturados } from "@/components/site/dados-estruturados";
-import { Oficio } from "@/components/site/oficio";
-import { Origem } from "@/components/site/origem";
-import { Planta } from "@/components/site/planta";
-import { Rigor } from "@/components/site/rigor";
+import { CtaFinal } from "@/components/site/cta-final";
+import { Estrutura } from "@/components/site/estrutura";
+import { Hero } from "@/components/site/hero";
+import { Institucional } from "@/components/site/institucional";
+import { Mercado } from "@/components/site/mercado";
+import { Numeros } from "@/components/site/numeros";
+import { Operacao } from "@/components/site/operacao";
+import { Produtos } from "@/components/site/produtos";
+import { Qualidade } from "@/components/site/qualidade";
+import { Sustentabilidade } from "@/components/site/sustentabilidade";
 import { Wagyu } from "@/components/site/wagyu";
-import { urlDoSite } from "@/lib/url";
 
-// Página institucional: conteúdo fixo, sem banco. Sai estática no build.
-export default function Pagina() {
+export default function Home() {
   return (
     <>
-      <DadosEstruturados url={urlDoSite()} />
-      <Cromados />
-
-      <main>
-        <Abertura />
-        <Origem />
-        <Planta />
-        <Oficio />
-        <Wagyu />
-        <Rigor />
-        <Contato />
-      </main>
-
-      <Rodape />
+      <Hero />
+      <Numeros />
+      <Institucional />
+      <Operacao />
+      <Produtos />
+      <Qualidade />
+      <Wagyu />
+      <Estrutura />
+      <Sustentabilidade />
+      <Mercado />
+      <CtaFinal />
     </>
   );
 }

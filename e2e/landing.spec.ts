@@ -1,56 +1,85 @@
 import { expect, test } from "@playwright/test";
 
-/**
- * A página pelo olho de um comprador: ele precisa entender de quem é a
- * empresa, o que ela comprova e como falar com alguém. Nada mais.
- */
+const ROTAS = [
+  "/",
+  "/frigorifico",
+  "/produtos",
+  "/qualidade",
+  "/sustentabilidade",
+  "/mercado",
+  "/contato",
+];
 
-test("os sete capítulos aparecem, na ordem", async ({ page }) => {
-  await page.goto("/");
-
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Mata Bem");
-
-  for (const titulo of [
-    "Tudo começa antes do portão da fábrica.",
-    "Seis mil metros quadrados sob um só registro.",
-    "O que pode ser comprovado.",
-  ]) {
-    await expect(page.getByRole("heading", { name: titulo })).toBeVisible();
+test("todas as rotas respondem e têm um h1", async ({ page }) => {
+  for (const rota of ROTAS) {
+    const resposta = await page.goto(rota);
+    expect(resposta?.status(), `${rota} não respondeu 200`).toBe(200);
+    await expect(page.getByRole("heading", { level: 1 }), `${rota} sem h1`).toHaveCount(1);
   }
+});
 
+test("a home apresenta a empresa e leva ao comercial", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Da origem à mesa");
+  await expect(page.getByRole("heading", { name: "Nossos produtos" })).toBeVisible();
   await expect(page.getByRole("heading", { name: /certificar Wagyu/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Fale com nossa/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Vamos conversar?" })).toBeVisible();
 });
 
-test("o telefone é clicável e é o CTA da página", async ({ page }) => {
-  await page.goto("/");
-
-  const telefone = page.getByRole("link", { name: "(31) 2106-3355" });
-  await expect(telefone).toHaveAttribute("href", "tel:+553121063355");
-
-  // O atalho fixo do topo leva à seção de contato.
-  await page.getByRole("link", { name: "Contato" }).click();
-  await expect(page.locator("#contato")).toBeInViewport();
+test("o telefone é clicável", async ({ page }) => {
+  await page.goto("/contato");
+  await expect(
+    page.getByRole("link", { name: "(31) 2106-3355" }).first(),
+  ).toHaveAttribute("href", "tel:+553121063355");
 });
 
-test("as evidências de inspeção estão na página", async ({ page }) => {
+test("a faixa de números não vai ao ar sem número confirmado", async ({ page }) => {
   await page.goto("/");
-
-  await expect(page.getByText("Inspeção Federal permanente na unidade")).toBeVisible();
-
-  // O número do SIF está em disputa (briefing diz 4127, pesquisa diz 585).
-  // Enquanto não for confirmado, não pode aparecer em lugar nenhum.
-  await expect(page.getByText(/SIF\s*4127/)).toHaveCount(0);
-  await expect(page.getByText(/DIPOA/).first()).toBeVisible();
-  await expect(page.getByText("Válido até 22/02/2031")).toBeVisible();
+  // Regra do briefing: número inventado não entra. Enquanto nada estiver
+  // confirmado, a seção inteira fica de fora.
+  await expect(page.getByText("capacidade produtiva")).toHaveCount(0);
 });
 
-test("a seção Wagyu inverte o contraste", async ({ page }) => {
+test("o que falta confirmar aparece marcado na página", async ({ page }) => {
+  await page.goto("/qualidade");
+  await expect(page.getByText("A confirmar").first()).toBeVisible();
+});
+
+test("o número do SIF não aparece enquanto está em disputa", async ({ page }) => {
+  for (const rota of ROTAS) {
+    await page.goto(rota);
+    await expect(page.getByText(/SIF\s*4127/), `${rota} mostra o SIF`).toHaveCount(0);
+  }
+});
+
+test("a rastreabilidade responde a clique e a teclado", async ({ page }) => {
+  await page.goto("/qualidade");
+
+  const transporte = page.getByRole("button", { name: "Transporte" });
+  await transporte.click();
+  await expect(transporte).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(/deslocamento até a unidade/)).toBeVisible();
+
+  // Sem mouse também: são botões de verdade, não divs com onClick.
+  await page.getByRole("button", { name: "Cliente" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByText(/próprio controle de qualidade/)).toBeVisible();
+});
+
+test("o menu do celular abre e navega", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
 
-  const wagyu = page.locator('[data-ch="04 · Wagyu"]');
-  // #e8e0d2 — é a única seção clara, e essa inversão é o clímax do design.
-  await expect(wagyu).toHaveCSS("background-color", "rgb(232, 224, 210)");
+  const abrir = page.getByRole("button", { name: "Abrir menu" });
+  await expect(abrir).toBeVisible();
+  await abrir.click();
+
+  await page.getByRole("navigation", { name: /celular/ }).getByRole("link", { name: "Produtos" }).click();
+  await expect(page).toHaveURL(/\/produtos$/);
+
+  // Trocar de página fecha o menu; senão ele fica por cima do destino.
+  await expect(page.getByRole("button", { name: "Abrir menu" })).toBeVisible();
 });
 
 test("nenhuma sobra do sistema antigo responde", async ({ page }) => {
@@ -65,8 +94,7 @@ test("quem pediu menos movimento não recebe animação", async ({ browser }) =>
   const page = await ctx.newPage();
   await page.goto("/");
 
-  // Com movimento reduzido o conteúdo chega posicionado, não translúcido.
-  const titulo = page.getByRole("heading", { name: "Tudo começa antes do portão da fábrica." });
+  const titulo = page.getByRole("heading", { name: /Construímos confiança/ });
   await expect(titulo).toBeVisible();
   await expect(titulo).toHaveCSS("opacity", "1");
 
