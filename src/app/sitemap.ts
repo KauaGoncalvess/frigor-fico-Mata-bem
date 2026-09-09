@@ -1,22 +1,14 @@
 import type { MetadataRoute } from "next";
 import { urlDoSite } from "@/lib/url";
 
+// Uma página só: institucional, conteúdo estável.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = urlDoSite();
-  const agora = new Date();
-
   return [
     {
-      url: base,
-      lastModified: agora,
-      changeFrequency: "daily", // preço de carne muda toda semana
+      url: urlDoSite(),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
       priority: 1,
-    },
-    {
-      url: `${base}/privacidade`,
-      lastModified: agora,
-      changeFrequency: "yearly",
-      priority: 0.3,
     },
   ];
 }
