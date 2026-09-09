@@ -33,12 +33,36 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/caminho/para/chrome npm test
 
 | Para mudar | Arquivo |
 | --- | --- |
-| Qualquer texto, telefone, endereço ou dado | `src/conteudo/empresa.ts` |
-| Cores, fontes e animações | `src/app/globals.css` |
-| Uma seção específica | `src/components/site/<seção>.tsx` |
-| Ordem das seções | `src/app/page.tsx` |
+| Textos e dados da empresa | `src/conteudo/*.ts` |
+| Menu e rodape | `src/conteudo/navegacao.ts` |
+| Cores, fontes e animacoes | `src/app/globals.css` |
+| Uma secao | `src/components/site/<secao>.tsx` |
+| Uma pagina | `src/app/<rota>/page.tsx` |
 
-Nenhum texto é escrito direto no JSX. Tudo vem de `src/conteudo/empresa.ts`.
+Nenhum texto e escrito direto no JSX.
+
+## Paginas
+
+`/` - `/frigorifico` - `/produtos` - `/qualidade` - `/sustentabilidade` - `/mercado` - `/contato`
+
+## O que ainda falta confirmar
+
+```bash
+npm run pendencias
+```
+
+Lista tudo que veio de pesquisa publica e ainda nao foi validado pela empresa
+— hoje **25 itens**. Cada um aparece na propria pagina com a etiqueta
+"A confirmar", que some quando o dado vira `confirmado: true` em `src/conteudo/`.
+
+Duas regras que o site cumpre sozinho:
+
+- A faixa de numeros **nao vai ao ar** enquanto nenhum numero estiver
+  confirmado. Cinco caixinhas escritas "a confirmar" fazem a empresa parecer
+  menor, nao maior.
+- O **numero do SIF nao aparece em lugar nenhum**. O briefing trazia 4127; a
+  pesquisa publica aponta 585 para este frigorifico. A pagina afirma so que ha
+  Inspecao Federal permanente na unidade.
 
 ## Imagens
 
