@@ -34,6 +34,34 @@ test("o telefone é clicável", async ({ page }) => {
   ).toHaveAttribute("href", "tel:+553121063355");
 });
 
+test("sustentabilidade e mercado saíram da home, mas seguem nas páginas", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /Produzir hoje/ })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /Atuação regional/ })).toHaveCount(0);
+
+  await page.goto("/sustentabilidade");
+  await expect(page.getByRole("heading", { name: /Produzir hoje/ }).first()).toBeVisible();
+
+  await page.goto("/mercado");
+  await expect(page.getByRole("heading", { name: /Atuação regional/ }).first()).toBeVisible();
+});
+
+test("todo espaço de foto carrega o seu placeholder", async ({ page }) => {
+  await page.goto("/");
+
+  const imagens = page.locator("figure img");
+  const total = await imagens.count();
+  expect(total).toBeGreaterThan(10);
+
+  for (let i = 0; i < total; i += 1) {
+    const src = await imagens.nth(i).getAttribute("src");
+    expect(src, "imagem sem src").toBeTruthy();
+    // Imagem quebrada tem naturalWidth 0 — é assim que se pega um 404.
+    const largura = await imagens.nth(i).evaluate((el: HTMLImageElement) => el.naturalWidth);
+    expect(largura, `${src} não carregou`).toBeGreaterThan(0);
+  }
+});
+
 test("a faixa de números não vai ao ar sem número confirmado", async ({ page }) => {
   await page.goto("/");
   // Regra do briefing: número inventado não entra. Enquanto nada estiver

@@ -47,7 +47,7 @@ export function Cabecalho() {
       )}
     >
       <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-[clamp(18px,5vw,60px)] py-4">
-        <Link href="/" className="font-display text-[clamp(20px,3vw,26px)] leading-none">
+        <Link href="/" className="font-display text-[clamp(20px,3vw,26px)] leading-none whitespace-nowrap">
           {EMPRESA.nome}
         </Link>
 

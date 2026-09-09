@@ -89,11 +89,11 @@ export const WAGYU = {
 export const ESTRUTURA = {
   titulo: "Uma estrutura preparada para produzir com eficiência.",
   fotos: [
-    "Planta industrial",
-    "Linha de produção",
-    "Câmaras frias",
-    "Expedição",
-    "Controle de qualidade",
-    "Equipe",
+    { arquivo: "estrutura-planta", legenda: "Planta industrial" },
+    { arquivo: "estrutura-linha", legenda: "Linha de produção" },
+    { arquivo: "estrutura-camaras", legenda: "Câmaras frias" },
+    { arquivo: "estrutura-expedicao", legenda: "Expedição" },
+    { arquivo: "estrutura-controle", legenda: "Controle de qualidade" },
+    { arquivo: "estrutura-equipe", legenda: "Equipe" },
   ],
 } as const;

@@ -2,12 +2,10 @@ import { CtaFinal } from "@/components/site/cta-final";
 import { Estrutura } from "@/components/site/estrutura";
 import { Hero } from "@/components/site/hero";
 import { Institucional } from "@/components/site/institucional";
-import { Mercado } from "@/components/site/mercado";
 import { Numeros } from "@/components/site/numeros";
 import { Operacao } from "@/components/site/operacao";
 import { Produtos } from "@/components/site/produtos";
 import { Qualidade } from "@/components/site/qualidade";
-import { Sustentabilidade } from "@/components/site/sustentabilidade";
 import { Wagyu } from "@/components/site/wagyu";
 
 export default function Home() {
@@ -21,8 +19,6 @@ export default function Home() {
       <Qualidade />
       <Wagyu />
       <Estrutura />
-      <Sustentabilidade />
-      <Mercado />
       <CtaFinal />
     </>
   );

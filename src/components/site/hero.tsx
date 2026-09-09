@@ -23,7 +23,8 @@ export function Hero() {
         style={{ animation: `aproximar 2.4s ${CINEMA} both` }}
       >
         <Moldura
-          alt="Estrutura do frigorífico e rebanho"
+          alt="Estrutura do frigorífico"
+          foto="hero"
           posicao="50% 45%"
           className="h-full w-full"
         />

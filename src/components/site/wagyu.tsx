@@ -40,8 +40,17 @@ export function Wagyu() {
 
         <Revelar className="mt-[clamp(24px,3.4vw,44px)]">
           <div className="grid gap-[clamp(14px,2.4vw,26px)] [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
-            {["Bovinos em pastagem", "Rebanho ao pôr do sol", "Suínos"].map((alt) => (
-              <Moldura key={alt} alt={alt} className="h-[clamp(200px,26vw,300px)] w-full" />
+            {[
+              { alt: "Rebanho", foto: "wagyu-1" },
+              { alt: "Bovinos em pastagem", foto: "wagyu-2" },
+              { alt: "Suínos", foto: "wagyu-3" },
+            ].map((item) => (
+              <Moldura
+                key={item.foto}
+                alt={item.alt}
+                foto={item.foto}
+                className="h-[clamp(200px,26vw,300px)] w-full"
+              />
             ))}
           </div>
         </Revelar>

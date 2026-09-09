@@ -9,11 +9,11 @@ export function CtaFinal() {
   return (
     <section
       id="contato"
-      data-ch="09 · Contato"
+      data-ch="07 · Contato"
       className="relative overflow-hidden border-t border-osso/12"
     >
       <div className="absolute inset-0 opacity-50">
-        <Moldura alt="Unidade do Mata Bem" posicao="50% 55%" className="h-full w-full" />
+        <Moldura alt="Unidade do Mata Bem" foto="cta" posicao="50% 55%" className="h-full w-full" />
       </div>
       <div className="absolute inset-0 bg-linear-to-b from-noite-950/95 via-noite-950/80 to-noite-950/97" />
 

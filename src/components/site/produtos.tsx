@@ -38,6 +38,7 @@ export function Produtos({ completo = false }: { completo?: boolean }) {
             <article id={produto.id} className="border-t border-osso/20 pt-5">
               <Moldura
                 alt={produto.nome}
+                foto={`produto-${produto.id}`}
                 className="mb-5 h-[clamp(180px,22vw,240px)] w-full"
               />
               <AConfirmar dado={produto.disponivel}>

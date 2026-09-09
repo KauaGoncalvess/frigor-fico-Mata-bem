@@ -15,6 +15,7 @@ export function Institucional() {
         <Revelar>
           <Moldura
             alt="Planta industrial e equipe do Mata Bem"
+            foto="institucional"
             className="h-[clamp(320px,50vw,560px)] w-full"
           />
         </Revelar>

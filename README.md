@@ -66,16 +66,29 @@ Duas regras que o site cumpre sozinho:
 
 ## Imagens
 
-As fotos ainda não existem. Cada `<figure>` usa o componente `Moldura`, que desenha
-um gradiente com grão e **reserva a altura exata da foto** — assim a página não pula
-quando ela entrar. Para colocar a foto real, passe `src`:
+As fotos definitivas ainda nao existem. Cada espaco usa um placeholder de
+`public/placeholders/`, gerado por:
 
-```tsx
-<Moldura alt="..." src="/fotos/planta.jpg" className="h-[clamp(340px,56vw,620px)] w-full" />
+```bash
+npm run placeholders
 ```
 
-Recomendação: ensaio na própria unidade. Para um comprador B2B, a foto do galpão
-inspecionado vale mais que imagem genérica de rebanho.
+Sao SVGs em grafite frio, com variacao por card e a legenda da foto que vai
+ali. Os tres da secao Wagyu saem claros, porque aquele bloco tem fundo linho.
+Hero e CTA saem sem legenda, porque ficam atras de texto.
+
+**Para colocar a foto real**, solte um arquivo com o mesmo nome em
+`public/placeholders/` — ou passe `src` direto:
+
+```tsx
+<Moldura alt="Linha de producao" src="/fotos/linha.jpg" className="h-[clamp(200px,24vw,290px)] w-full" />
+```
+
+A altura de cada espaco ja esta reservada, entao a pagina nao pula quando a
+foto entrar.
+
+Recomendacao: ensaio na propria unidade. Para um comprador B2B, a foto do
+galpao inspecionado vale mais que imagem generica de rebanho.
 
 ## Antes de publicar
 

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-label="Estrutura da unidade">
+  <defs>
+    <linearGradient id="base" gradientTransform="rotate(45)">
+      <stop offset="0%" stop-color="rgb(17,14,9)"/>
+      <stop offset="100%" stop-color="rgb(9,6,0)"/>
+    </linearGradient>
+    <radialGradient id="foco" cx="50%" cy="46%" r="78%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".07"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grao">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#base)"/>
+  <rect width="1200" height="675" fill="url(#foco)"/>
+  <rect width="1200" height="675" filter="url(#grao)" opacity=".05"/>
+
+  <rect x=".5" y=".5" width="1199" height="674" fill="none"
+        stroke="#f0e9dd" stroke-opacity=".14"/>
+
+
+</svg>

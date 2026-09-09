@@ -20,11 +20,12 @@ export function Estrutura() {
       titulo={ESTRUTURA.titulo}
     >
       <div className="grid gap-[clamp(14px,2vw,22px)] [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
-        {ESTRUTURA.fotos.map((legenda, i) => (
-          <Revelar key={legenda} atraso={Math.min(i, 3) * 0.09}>
+        {ESTRUTURA.fotos.map((foto, i) => (
+          <Revelar key={foto.legenda} atraso={Math.min(i, 3) * 0.09}>
             <Moldura
-              alt={legenda}
-              legenda={legenda}
+              alt={foto.legenda}
+              foto={foto.arquivo}
+              legenda={foto.legenda}
               className="h-[clamp(200px,24vw,290px)] w-full"
             />
           </Revelar>
